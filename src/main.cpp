@@ -30,7 +30,7 @@ int main() {
     SetTargetFPS(60);
 
     // Load texture first to get dimensions
-    Texture2D spriteSheet = LoadTexture("assets/Soldier.png");
+    Texture2D spriteSheet = LoadTexture("/home/chrise/programming/learning_raylib/my_game/assets/Soldier.png");
     const int frameWidth = 100;  // Hardcode if your frames are exactly 100x100
     const int frameHeight = 100; // Adjust if needed
 
@@ -98,7 +98,7 @@ int main() {
                     spriteSheet,
                     player.animations[1][currentFrame], // Access walk frames correctly
                     player.position,
-                    Vector2{frameWidth * 0.5f, frameHeight * 0.5f}, // 50% scale (adjust as needed)
+                    Vector2{frameWidth * 0.0875f, frameHeight * 0.0875f}, // 50% scale (adjust as needed)
                     WHITE
                 );
             }
