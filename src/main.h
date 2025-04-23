@@ -10,6 +10,12 @@ struct Player
   Vector3 size;
   float speed;
   std::vector<std::vector<Rectangle>> animations;
+  bool facingRight;
+};
+
+struct Game
+{
+  std::vector<Texture2D> textures;
 };
 
 #endif
