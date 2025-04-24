@@ -4,10 +4,10 @@
 #include "main.h"
 
 // Return a vector of Rectangles for a specific animation row
-std::vector<Rectangle> loadSpritesIntoRectangles(int frameCount, int rowIndex, int frameWidth, int frameHeight) {
+std::vector<Rectangle> loadSpritesIntoRectangles(int frameCount, int rowIndex, int frameOffset, int frameWidth, int frameHeight) {
 
     std::vector<Rectangle> frames;
-    for (int i = 0; i < frameCount; i++) {
+    for (int i = 0; i < frameCount - frameOffset; i++) {
         frames.push_back({
             (float)(i * frameWidth),
             (float)(rowIndex * frameHeight),
@@ -18,11 +18,11 @@ std::vector<Rectangle> loadSpritesIntoRectangles(int frameCount, int rowIndex, i
     return frames;
 }
 
-std::vector<Rectangle> loadSpritesIntoRectanglesFlipped(int frameCount, int rowIndex, int frameWidth, int frameHeight)
+std::vector<Rectangle> loadSpritesIntoRectanglesFlipped(int frameCount, int rowIndex, int frameOffset, int frameWidth, int frameHeight)
 {
 
   std::vector<Rectangle> frames;
-  for(int i = frameCount - 1; i >= 1; i--)
+  for(int i = frameCount - 1; i >= frameOffset; i--)
   {
     frames.push_back({
       (float)(i * 100),
@@ -35,21 +35,21 @@ std::vector<Rectangle> loadSpritesIntoRectanglesFlipped(int frameCount, int rowI
 
 }
 
-void loadPlayerAnimations(Player& player, int frameWidth, int frameHeight) {
+void loadPlayerAnimations(Player& player, int numFrames, int frameWidth, int frameHeight) {
 
   player.animations.clear();
 
-  player.animations.push_back(loadSpritesIntoRectangles(6, 0, frameWidth, frameHeight)); // Idle
-  player.animations.push_back(loadSpritesIntoRectanglesFlipped(6, 0, frameWidth, frameHeight));
+  player.animations.push_back(loadSpritesIntoRectangles(numFrames, 0, 3, frameWidth, frameHeight)); // Idle
+  player.animations.push_back(loadSpritesIntoRectanglesFlipped(numFrames, 0, 3, frameWidth, frameHeight));
 
-  player.animations.push_back(loadSpritesIntoRectangles(9, 1, frameWidth, frameHeight)); // walk
-  player.animations.push_back(loadSpritesIntoRectanglesFlipped(9, 1, frameWidth, frameHeight));
+  player.animations.push_back(loadSpritesIntoRectangles(numFrames, 1, 1, frameWidth, frameHeight)); // walk
+  player.animations.push_back(loadSpritesIntoRectanglesFlipped(numFrames, 1, 1, frameWidth, frameHeight));
 
-  player.animations.push_back(loadSpritesIntoRectangles(6, 2, frameWidth, frameHeight)); // Attack
-  player.animations.push_back(loadSpritesIntoRectanglesFlipped(6, 2, frameWidth, frameHeight));
+  player.animations.push_back(loadSpritesIntoRectangles(numFrames, 2, 3, frameWidth, frameHeight)); // Attack
+  player.animations.push_back(loadSpritesIntoRectanglesFlipped(numFrames, 2, 3, frameWidth, frameHeight));
 
-  player.animations.push_back(loadSpritesIntoRectangles(4, 6, frameWidth, frameHeight)); // Die
-  player.animations.push_back(loadSpritesIntoRectanglesFlipped(4, 6, frameWidth, frameHeight));
+  player.animations.push_back(loadSpritesIntoRectangles(numFrames, 6, 5, frameWidth, frameHeight)); // Die
+  player.animations.push_back(loadSpritesIntoRectanglesFlipped(numFrames, 6, 5, frameWidth, frameHeight));
 }
 
 void handleTextureLoading(Game& game)
@@ -75,11 +75,13 @@ int main() {
   SetTargetFPS(60);
 
   Game game = {
-    {}
+    {},
+    RIGHT
   };
 
   handleTextureLoading(game);
 
+  const int numFrames = 9;
   const int frameWidth = 100; 
   const int frameHeight = 100;
 
@@ -88,16 +90,18 @@ int main() {
     {1.0f, 1.0f, 1.0f},
     0.1f,
     {}, // Empty vector (will be filled by loadPlayerAnimations)
-    true
+    true,
+    true,
+    IDLE_RIGHT
   };
 
   float playerSpriteScale = 0.0625f;
 
-  loadPlayerAnimations(player, frameWidth, frameHeight);
+  loadPlayerAnimations(player, numFrames, frameWidth, frameHeight);
 
+  Vector2 playerSize = {frameWidth * playerSpriteScale, frameHeight * playerSpriteScale};
 
-
-  // Rest of your camera setup...
+  // setting up the camera
   Camera3D camera = {0};
   camera.position = {0.0f, 2.0f, -5.0f};
   camera.target = player.position;
@@ -110,19 +114,44 @@ int main() {
 
   int currentFrame = 0;
   float animTime = 0.0f;
-  float frameDuration = 0.1f;
+  float frameDuration = 0.5f;
 
   while (!WindowShouldClose()) {
         
     float deltaTime = GetFrameTime();
 
+    if(!IsKeyPressed(KEY_W) || !IsKeyPressed(KEY_A) || !IsKeyPressed(KEY_S) || !IsKeyPressed(KEY_D))
+    {
+      if(player.facingRight)
+      {
+        player.action = IDLE_RIGHT;
+      }
+      else {
+        player.action = IDLE_LEFT;
+      }
+    }
+
     if(IsKeyDown(KEY_W))
     {
+      if(player.facingRight)
+      {
+        player.action = WALK_RIGHT;
+      }
+      else {
+        player.action = WALK_LEFT;
+      }
       player.position.z += player.speed;
     }
 
     if(IsKeyDown(KEY_S))
     {
+      if(player.facingRight)
+      {
+        player.action = WALK_RIGHT;
+      }
+      else {
+        player.action = WALK_LEFT;
+      }
       player.position.z -= player.speed;
     }
 
@@ -130,12 +159,16 @@ int main() {
     {
       player.position.x += player.speed;
       player.facingRight = false;
+      player.action = WALK_LEFT;
+      game.direction = LEFT;
     }
 
     if(IsKeyDown(KEY_D))
     {
       player.position.x -= player.speed;
       player.facingRight = true;
+      player.action = WALK_RIGHT;
+      game.direction = RIGHT;
     }
 
     // update animation
@@ -143,7 +176,8 @@ int main() {
     if(animTime >= frameDuration)
     {
       animTime = 0;
-      currentFrame = (currentFrame + 1) % player.animations[3].size();
+      currentFrame = (currentFrame + 1) % player.animations[player.action].size();
+      TraceLog(LOG_INFO, "CURRENT FRAME: %d | CURRENT ACTION: %d", currentFrame, player.action);
     }
 
     // camera follow
@@ -157,8 +191,6 @@ int main() {
 
     camera.target = player.position;
 
-    Rectangle frameRect = player.animations[3][0];
-
     // Draw
     BeginDrawing();
     ClearBackground(RAYWHITE);
@@ -167,30 +199,18 @@ int main() {
 
     DrawGrid(10, 1.0f);
 
-    if(!player.animations.empty() && !player.animations[1].empty())
+    if(!player.animations.empty() && !player.animations[player.action].empty())
     {
+  
+      DrawBillboardRec(
+          camera, 
+          game.textures[game.direction], 
+          player.animations[player.action][currentFrame], 
+          player.position, 
+          playerSize, 
+          WHITE
+      );
 
-      if(player.facingRight)
-      {
-        DrawBillboardRec(
-            camera,
-            game.textures[0],
-            player.animations[2][currentFrame],
-            player.position,
-            (Vector2){frameWidth * playerSpriteScale, frameHeight * playerSpriteScale},
-            WHITE
-        );
-      }
-      else {
-        DrawBillboardRec(
-            camera,
-            game.textures[1],
-            player.animations[3][currentFrame],
-            player.position,
-            (Vector2){frameWidth * playerSpriteScale, frameHeight * playerSpriteScale}, 
-            WHITE
-        );
-      }
     }
 
   EndMode3D();
