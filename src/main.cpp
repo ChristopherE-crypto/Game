@@ -21,7 +21,6 @@ std::vector<Rectangle> loadSpritesIntoRectangles(int frameCount, int rowIndex, i
 std::vector<Rectangle> loadSpritesIntoRectanglesFlipped(int frameCount, int rowIndex, int frameWidth, int frameHeight)
 {
 
-  int j = 0;
   std::vector<Rectangle> frames;
   for(int i = frameCount - 1; i >= 1; i--)
   {
@@ -31,7 +30,6 @@ std::vector<Rectangle> loadSpritesIntoRectanglesFlipped(int frameCount, int rowI
       (float)frameWidth,
       (float)frameHeight
     });
-    j++;
   }
   return frames;
 
@@ -97,6 +95,8 @@ int main() {
 
   loadPlayerAnimations(player, frameWidth, frameHeight);
 
+
+
   // Rest of your camera setup...
   Camera3D camera = {0};
   camera.position = {0.0f, 2.0f, -5.0f};
@@ -143,7 +143,7 @@ int main() {
     if(animTime >= frameDuration)
     {
       animTime = 0;
-      currentFrame = (currentFrame + 1) % player.animations[1].size();
+      currentFrame = (currentFrame + 1) % player.animations[3].size();
     }
 
     // camera follow
@@ -168,15 +168,29 @@ int main() {
     DrawGrid(10, 1.0f);
 
     if(!player.animations.empty() && !player.animations[1].empty())
-    {    
-      DrawBillboardRec(
-      camera,
-      game.textures[1],
-      frameRect,
-      player.position,
-      (Vector2){frameWidth * playerSpriteScale, frameHeight * playerSpriteScale},
-      WHITE
-      );
+    {
+
+      if(player.facingRight)
+      {
+        DrawBillboardRec(
+            camera,
+            game.textures[0],
+            player.animations[2][currentFrame],
+            player.position,
+            (Vector2){frameWidth * playerSpriteScale, frameHeight * playerSpriteScale},
+            WHITE
+        );
+      }
+      else {
+        DrawBillboardRec(
+            camera,
+            game.textures[1],
+            player.animations[3][currentFrame],
+            player.position,
+            (Vector2){frameWidth * playerSpriteScale, frameHeight * playerSpriteScale}, 
+            WHITE
+        );
+      }
     }
 
   EndMode3D();
