@@ -13,6 +13,24 @@ struct Player
   bool facingRight;
 };
 
+enum Action
+{
+  IDLE_RIGHT,
+  IDLE_LEFT,
+  WALK_RIGHT,
+  WALK_LEFT,
+  ATTACK_RIGHT,
+  ATTACK_LEFT,
+  DIE_RIGHT,
+  DIE_LEFT
+};
+
+enum Direction
+{
+  RIGHT,
+  LEFT
+};
+
 struct Game
 {
   std::vector<Texture2D> textures;
