@@ -54,7 +54,7 @@ void loadPlayerAnimations(Player& player, int numFrames, int frameWidth, int fra
 
 void handleTextureLoading(Game& game)
 {
-  Image img = LoadImage("/home/chrise/programming/learning_raylib/my_game/assets/Soldier.png");
+  Image img = LoadImage("../assets/Soldier.png");
 
   Texture2D spriteSheet = LoadTextureFromImage(img);
 
@@ -114,63 +114,50 @@ int main() {
 
   int currentFrame = 0;
   float animTime = 0.0f;
-  float frameDuration = 0.5f;
+  float frameDuration = 0.1f;
 
   while (!WindowShouldClose()) {
         
     float deltaTime = GetFrameTime();
 
-    if(!IsKeyPressed(KEY_W) || !IsKeyPressed(KEY_A) || !IsKeyPressed(KEY_S) || !IsKeyPressed(KEY_D))
-    {
-      if(player.facingRight)
-      {
-        player.action = IDLE_RIGHT;
-      }
-      else {
-        player.action = IDLE_LEFT;
-      }
-    }
-
+    bool isMoving = false;
+    
     if(IsKeyDown(KEY_W))
     {
-      if(player.facingRight)
-      {
-        player.action = WALK_RIGHT;
-      }
-      else {
-        player.action = WALK_LEFT;
-      }
       player.position.z += player.speed;
+      isMoving = true;
     }
 
     if(IsKeyDown(KEY_S))
     {
-      if(player.facingRight)
-      {
-        player.action = WALK_RIGHT;
-      }
-      else {
-        player.action = WALK_LEFT;
-      }
       player.position.z -= player.speed;
+      isMoving = true;
     }
 
     if(IsKeyDown(KEY_A))
     {
       player.position.x += player.speed;
       player.facingRight = false;
-      player.action = WALK_LEFT;
-      game.direction = LEFT;
+      isMoving = true;
     }
 
     if(IsKeyDown(KEY_D))
     {
       player.position.x -= player.speed;
       player.facingRight = true;
-      player.action = WALK_RIGHT;
-      game.direction = RIGHT;
+      isMoving = true;
     }
 
+    game.direction = player.facingRight ? RIGHT : LEFT;
+
+    if(!isMoving)
+    {
+      player.action = player.facingRight ? IDLE_RIGHT : IDLE_LEFT;
+    }
+    else {
+      player.action = player.facingRight ? WALK_RIGHT : WALK_LEFT;
+    }
+    
     // update animation
     animTime += deltaTime;
     if(animTime >= frameDuration)
