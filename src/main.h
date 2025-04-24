@@ -4,15 +4,6 @@
 #include <raylib.h>
 #include <vector>
 
-struct Player
-{
-  Vector3 position;
-  Vector3 size;
-  float speed;
-  std::vector<std::vector<Rectangle>> animations;
-  bool facingRight;
-};
-
 enum Action
 {
   IDLE_RIGHT,
@@ -25,6 +16,17 @@ enum Action
   DIE_LEFT
 };
 
+struct Player
+{
+  Vector3 position;
+  Vector3 size;
+  float speed;
+  std::vector<std::vector<Rectangle>> animations;
+  bool facingRight;
+  bool idle;
+  Action action;
+};
+
 enum Direction
 {
   RIGHT,
@@ -34,6 +36,7 @@ enum Direction
 struct Game
 {
   std::vector<Texture2D> textures;
+  Direction direction;
 };
 
 #endif
