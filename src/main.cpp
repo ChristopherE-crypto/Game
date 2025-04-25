@@ -1,7 +1,15 @@
 #include <raylib.h>
 #include <raymath.h>
+#include <utility>
 #include <vector>
 #include "main.h"
+
+/*
+ * PLAYER SPRITESHEET COMES FROM: https://zerie.itch.io/tiny-rpg-character-asset-pack
+ *
+ *
+ */
+
 
 // Return a vector of Rectangles for a specific animation row
 std::vector<Rectangle> loadSpritesIntoRectangles(int frameCount, int rowIndex, int frameOffset, int frameWidth, int frameHeight) {
@@ -137,8 +145,24 @@ int main() {
   camera.fovy = 45.0f;
   camera.projection = CAMERA_PERSPECTIVE;
 
-  Vector3 cameraOffset = {0.0f, 2.0f, -5.0f};
+  //Vector3 cameraOffset = {0.0f, 2.0f, -5.0f};
   float cameraFollowSpeed = 5.0f;
+
+  float cameraRotationAngle = 0.0f;
+  float cameraRotationSpeed = 1.5f;
+  float cameraDistance = 5.0f;
+  float cameraHeight = 2.0f;
+  //float targetRotationAngle = 0.0f;
+  //float rotationLerpSpeed = 3.0f;
+  float minCameraDistance = 3.0f;
+  float maxCameraDistance = 20.0f;
+  float zoomSpeed = 75.0f;
+
+  Vector3 cameraOffset = {
+    sinf(cameraRotationAngle) * cameraDistance,
+    cameraHeight,
+    cosf(cameraRotationAngle) * cameraDistance
+  };
 
   int currentFrame = 0;
   float animTime = 0.0f;
@@ -151,23 +175,57 @@ int main() {
         
     float deltaTime = GetFrameTime();
 
+    Vector3 cameraForward = Vector3Normalize((Vector3){sinf(cameraRotationAngle), 0, cosf(cameraRotationAngle)});
+
     movementInput = {0};
     isMoving = false;
 
+    if(IsKeyDown(KEY_S)) movementInput = Vector3Add(movementInput, cameraForward);
+    if(IsKeyDown(KEY_W)) movementInput = Vector3Add(movementInput, Vector3Negate(cameraForward));
+    if(IsKeyDown(KEY_A)) movementInput = Vector3Add(movementInput, (Vector3){-cameraForward.z, 0, cameraForward.x});
+    if(IsKeyDown(KEY_D)) movementInput = Vector3Add(movementInput, (Vector3){cameraForward.z, 0, -cameraForward.x});
+
+    /*
     if(IsKeyDown(KEY_W)) movementInput.z += 1.0f;
     if(IsKeyDown(KEY_S)) movementInput.z -= 1.0f;
     if(IsKeyDown(KEY_A)) movementInput.x += 1.0f;
     if(IsKeyDown(KEY_D)) movementInput.x -= 1.0f;
+    */
+
+    if(IsKeyDown(KEY_Q))
+    {
+      cameraRotationAngle -= cameraRotationSpeed * deltaTime;
+    }
+    if(IsKeyDown(KEY_E))
+    {
+      cameraRotationAngle += cameraRotationSpeed * deltaTime;
+    }
+
+    float wheel = GetMouseWheelMove();
+    if(wheel != 0)
+    {
+      cameraDistance = Clamp(cameraDistance - wheel * zoomSpeed * deltaTime, minCameraDistance, maxCameraDistance);
+    }
+
+    cameraRotationAngle = fmodf(cameraRotationAngle, 2 * PI);
+    //cameraRotationAngle = Lerp(cameraRotationAngle, targetRotationAngle, rotationLerpSpeed * deltaTime);
+    if(cameraRotationAngle < 0)
+    {
+      cameraRotationAngle += 2 * PI;
+    }
 
     if(Vector3Length(movementInput) > 0)
     {
       movementInput = Vector3Normalize(movementInput);
       isMoving = true;
 
-      if(fabsf(movementInput.x) > 0.1f)
-      {
-        player.facingRight = (movementInput.x < 0);
-      }
+      if(IsKeyDown(KEY_D)) player.facingRight = true;
+      if(IsKeyDown(KEY_A)) player.facingRight = false;
+
+      //if(fabsf(movementInput.x) > 0.1f)
+      //{
+      //  player.facingRight = (movementInput.x < 0);
+      //}
     }
 
     float currentSpeed = IsKeyDown(KEY_LEFT_SHIFT) ? runSpeed : walkSpeed;
@@ -204,6 +262,12 @@ int main() {
       currentFrame = (currentFrame + 1) % player.animations[player.action].size();
       TraceLog(LOG_INFO, "CURRENT FRAME: %d | CURRENT ACTION: %d", currentFrame, player.action);
     }
+
+    cameraOffset = {
+      sinf(cameraRotationAngle) * cameraDistance,
+      cameraHeight,
+      cosf(cameraRotationAngle) * cameraDistance
+    };
 
     // camera follow
     Vector3 desiredCameraPos = {
