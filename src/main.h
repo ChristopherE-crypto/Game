@@ -16,12 +16,18 @@ enum Action
   DIE_LEFT
 };
 
+struct AnimationData
+{
+  float frameDuration;
+};
+
 struct Player
 {
   Vector3 position;
   Vector3 size;
   float speed;
   std::vector<std::vector<Rectangle>> animations;
+  std::vector<AnimationData> animationData;
   bool facingRight;
   bool idle;
   Action action;
