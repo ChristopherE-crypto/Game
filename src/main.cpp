@@ -38,18 +38,37 @@ std::vector<Rectangle> loadSpritesIntoRectanglesFlipped(int frameCount, int rowI
 void loadPlayerAnimations(Player& player, int numFrames, int frameWidth, int frameHeight) {
 
   player.animations.clear();
+  player.animationData.clear();
+
+  const float idleSpeed = 0.5f;
+  const float walkSpeed = 0.1f;
+  const float attackSpeed = 0.25f;
+  const float dieSpeed = 0.5f;
 
   player.animations.push_back(loadSpritesIntoRectangles(numFrames, 0, 3, frameWidth, frameHeight)); // Idle
   player.animations.push_back(loadSpritesIntoRectanglesFlipped(numFrames, 0, 3, frameWidth, frameHeight));
 
+  player.animationData.push_back({idleSpeed});
+  player.animationData.push_back({idleSpeed});
+
   player.animations.push_back(loadSpritesIntoRectangles(numFrames, 1, 1, frameWidth, frameHeight)); // walk
   player.animations.push_back(loadSpritesIntoRectanglesFlipped(numFrames, 1, 1, frameWidth, frameHeight));
+
+  player.animationData.push_back({walkSpeed});
+  player.animationData.push_back({walkSpeed});
 
   player.animations.push_back(loadSpritesIntoRectangles(numFrames, 2, 3, frameWidth, frameHeight)); // Attack
   player.animations.push_back(loadSpritesIntoRectanglesFlipped(numFrames, 2, 3, frameWidth, frameHeight));
 
+  player.animationData.push_back({attackSpeed});
+  player.animationData.push_back({attackSpeed});
+
   player.animations.push_back(loadSpritesIntoRectangles(numFrames, 6, 5, frameWidth, frameHeight)); // Die
   player.animations.push_back(loadSpritesIntoRectanglesFlipped(numFrames, 6, 5, frameWidth, frameHeight));
+
+  player.animationData.push_back({dieSpeed});
+  player.animationData.push_back({dieSpeed});
+
 }
 
 void handleTextureLoading(Game& game)
@@ -90,6 +109,7 @@ int main() {
     {1.0f, 1.0f, 1.0f},
     0.1f,
     {}, // Empty vector (will be filled by loadPlayerAnimations)
+    {}, // animationData vector
     true,
     true,
     IDLE_RIGHT
@@ -100,6 +120,14 @@ int main() {
   loadPlayerAnimations(player, numFrames, frameWidth, frameHeight);
 
   Vector2 playerSize = {frameWidth * playerSpriteScale, frameHeight * playerSpriteScale};
+
+  Vector3 movementInput = {0.0f, 0.0f, 0.0f};
+  bool isMoving = false;
+  Vector3 currentVelocity = {0};
+  float acceleration = 10.0f;
+  float deceleration = 15.0f;
+  float walkSpeed = 2.0f;
+  float runSpeed = 4.0f;
 
   // setting up the camera
   Camera3D camera = {0};
@@ -116,51 +144,61 @@ int main() {
   float animTime = 0.0f;
   float frameDuration = 0.1f;
 
+  Action previousAction = player.action;
+  int previousFrameCount = 0;
+
   while (!WindowShouldClose()) {
         
     float deltaTime = GetFrameTime();
 
-    bool isMoving = false;
-    
-    if(IsKeyDown(KEY_W))
+    movementInput = {0};
+    isMoving = false;
+
+    if(IsKeyDown(KEY_W)) movementInput.z += 1.0f;
+    if(IsKeyDown(KEY_S)) movementInput.z -= 1.0f;
+    if(IsKeyDown(KEY_A)) movementInput.x += 1.0f;
+    if(IsKeyDown(KEY_D)) movementInput.x -= 1.0f;
+
+    if(Vector3Length(movementInput) > 0)
     {
-      player.position.z += player.speed;
+      movementInput = Vector3Normalize(movementInput);
       isMoving = true;
+
+      if(fabsf(movementInput.x) > 0.1f)
+      {
+        player.facingRight = (movementInput.x < 0);
+      }
     }
 
-    if(IsKeyDown(KEY_S))
+    float currentSpeed = IsKeyDown(KEY_LEFT_SHIFT) ? runSpeed : walkSpeed;
+    Vector3 targetVelocity = Vector3Scale(movementInput, currentSpeed);
+
+    currentVelocity = Vector3MoveTowards(currentVelocity, targetVelocity, isMoving ? acceleration * deltaTime : deceleration * deltaTime);
+
+    player.position = Vector3Add(player.position, Vector3Scale(currentVelocity, deltaTime));
+
+    if(player.action != previousAction)
     {
-      player.position.z -= player.speed;
-      isMoving = true;
+      float progress = animTime / player.animationData[previousAction].frameDuration;
+      currentFrame = 0;
+      animTime = progress * player.animationData[player.action].frameDuration;
+      previousAction = player.action;
     }
 
-    if(IsKeyDown(KEY_A))
+    if(Vector3Length(currentVelocity) > 0.1f)
     {
-      player.position.x += player.speed;
-      player.facingRight = false;
-      isMoving = true;
+      player.action = player.facingRight ? WALK_RIGHT : WALK_LEFT;
     }
-
-    if(IsKeyDown(KEY_D))
-    {
-      player.position.x -= player.speed;
-      player.facingRight = true;
-      isMoving = true;
+    else {
+      player.action = player.facingRight ? IDLE_RIGHT : IDLE_LEFT;
     }
 
     game.direction = player.facingRight ? RIGHT : LEFT;
-
-    if(!isMoving)
-    {
-      player.action = player.facingRight ? IDLE_RIGHT : IDLE_LEFT;
-    }
-    else {
-      player.action = player.facingRight ? WALK_RIGHT : WALK_LEFT;
-    }
     
     // update animation
     animTime += deltaTime;
-    if(animTime >= frameDuration)
+    float currentFrameDuration = player.animationData[player.action].frameDuration;
+    if(animTime >= currentFrameDuration)
     {
       animTime = 0;
       currentFrame = (currentFrame + 1) % player.animations[player.action].size();
