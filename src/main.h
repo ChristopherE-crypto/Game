@@ -4,6 +4,23 @@
 #include <raylib.h>
 #include <vector>
 
+enum GameState
+{
+  MENU,
+  PLAYING,
+  PAUSED,
+  GAME_OVER
+};
+
+struct Button
+{
+  Rectangle bounds;
+  const char* text;
+  Color color;
+  Color hoverColor;
+  bool hovered;
+};
+
 enum Action
 {
   IDLE_RIGHT,
@@ -43,13 +60,20 @@ struct Game
 {
   std::vector<Texture2D> textures;
   Direction direction;
+
+  GameState gameState;
   
   //Texture2D heightmap;
   //Model terrainModel;
  // float terrainScale = 1.0f;
-  //float terrainHeightScale = 0.5f;
+//float terrainHeightScale = 0.5f;
 
   Model treeModel;
+  Model rockModel;
+  Model boulderModel;
+
+  Font font;
+  std::vector<Button> menuButtons;
 };
 
 struct Environment
