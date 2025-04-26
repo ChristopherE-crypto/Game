@@ -43,6 +43,20 @@ struct Game
 {
   std::vector<Texture2D> textures;
   Direction direction;
+  
+  //Texture2D heightmap;
+  //Model terrainModel;
+ // float terrainScale = 1.0f;
+  //float terrainHeightScale = 0.5f;
+
+  Model treeModel;
+};
+
+struct Environment
+{
+  std::vector<Vector3> trees;
+  std::vector<std::pair<Vector3, float>> rocks;
+  std::vector<std::pair<Vector3, float>> boulders;
 };
 
 #endif
