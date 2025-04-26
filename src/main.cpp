@@ -1,12 +1,11 @@
 #include <raylib.h>
 #include <raymath.h>
-#include <utility>
 #include <vector>
 #include "main.h"
 
 /*
  * PLAYER SPRITESHEET COMES FROM: https://zerie.itch.io/tiny-rpg-character-asset-pack
- *
+ * PINE 3D MODEL FROM: Pine tree by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/7rTNpk6j01O)
  *
  */
 
@@ -96,6 +95,24 @@ void handleTextureLoading(Game& game)
   UnloadImage(img);
 }
 
+void drawTreeModel(Model model, Vector3 position, float scale = 1.0f)
+{
+  DrawModelEx(model, position, (Vector3){0,1,0}, 0.0f, (Vector3){scale, scale, scale}, WHITE);
+}
+
+void populateStarterArea(Environment& env)
+{
+  env.trees.push_back({5.0f, 1.0f, 5.0f});
+  env.trees.push_back({-3.0f, 1.0f, 8.0f});
+  env.trees.push_back({7.0f, 1.0f, -4.0f});
+
+  env.rocks.push_back({{2.0f, 0.0f, 3.0f}, 0.5f});
+  env.rocks.push_back({{-1.0f, 0.0f, 4.0f}, 0.7f});
+
+  env.boulders.push_back({{-5.0f, 0.0f, 0.0f}, 1.2f});
+  env.boulders.push_back({{4.0f, 0.0f, -6.0f}, 1.5f});
+}
+
 int main() {
 
   InitWindow(800, 800, "MY GAME");
@@ -106,14 +123,20 @@ int main() {
     RIGHT
   };
 
+  Environment env;
+  populateStarterArea(env);
+
   handleTextureLoading(game);
+  
+  game.treeModel = LoadModel("../assets/pine_tree.glb");
+  
 
   const int numFrames = 9;
   const int frameWidth = 100; 
   const int frameHeight = 100;
 
   Player player = {
-    {0.0f, 0.0f, 0.0f},
+    {0.0f, 0.5f, 0.0f},
     {1.0f, 1.0f, 1.0f},
     0.1f,
     {}, // Empty vector (will be filled by loadPlayerAnimations)
@@ -145,15 +168,12 @@ int main() {
   camera.fovy = 45.0f;
   camera.projection = CAMERA_PERSPECTIVE;
 
-  //Vector3 cameraOffset = {0.0f, 2.0f, -5.0f};
   float cameraFollowSpeed = 5.0f;
 
   float cameraRotationAngle = 0.0f;
   float cameraRotationSpeed = 1.5f;
   float cameraDistance = 5.0f;
   float cameraHeight = 2.0f;
-  //float targetRotationAngle = 0.0f;
-  //float rotationLerpSpeed = 3.0f;
   float minCameraDistance = 3.0f;
   float maxCameraDistance = 20.0f;
   float zoomSpeed = 75.0f;
@@ -170,7 +190,7 @@ int main() {
 
   Action previousAction = player.action;
   int previousFrameCount = 0;
-
+ 
   while (!WindowShouldClose()) {
         
     float deltaTime = GetFrameTime();
@@ -184,13 +204,6 @@ int main() {
     if(IsKeyDown(KEY_W)) movementInput = Vector3Add(movementInput, Vector3Negate(cameraForward));
     if(IsKeyDown(KEY_A)) movementInput = Vector3Add(movementInput, (Vector3){-cameraForward.z, 0, cameraForward.x});
     if(IsKeyDown(KEY_D)) movementInput = Vector3Add(movementInput, (Vector3){cameraForward.z, 0, -cameraForward.x});
-
-    /*
-    if(IsKeyDown(KEY_W)) movementInput.z += 1.0f;
-    if(IsKeyDown(KEY_S)) movementInput.z -= 1.0f;
-    if(IsKeyDown(KEY_A)) movementInput.x += 1.0f;
-    if(IsKeyDown(KEY_D)) movementInput.x -= 1.0f;
-    */
 
     if(IsKeyDown(KEY_Q))
     {
@@ -208,7 +221,7 @@ int main() {
     }
 
     cameraRotationAngle = fmodf(cameraRotationAngle, 2 * PI);
-    //cameraRotationAngle = Lerp(cameraRotationAngle, targetRotationAngle, rotationLerpSpeed * deltaTime);
+    
     if(cameraRotationAngle < 0)
     {
       cameraRotationAngle += 2 * PI;
@@ -221,11 +234,6 @@ int main() {
 
       if(IsKeyDown(KEY_D)) player.facingRight = true;
       if(IsKeyDown(KEY_A)) player.facingRight = false;
-
-      //if(fabsf(movementInput.x) > 0.1f)
-      //{
-      //  player.facingRight = (movementInput.x < 0);
-      //}
     }
 
     float currentSpeed = IsKeyDown(KEY_LEFT_SHIFT) ? runSpeed : walkSpeed;
@@ -282,11 +290,20 @@ int main() {
 
     // Draw
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    ClearBackground(SKYBLUE);
 
     BeginMode3D(camera);
 
     DrawGrid(10, 1.0f);
+
+    DrawPlane((Vector3){0.0f, 0.0f, 0.0f}, (Vector2){50,50}, DARKGREEN);
+
+    //drawTreeModel(game.treeModel, (Vector3){0.0f, 1.0f, 0.0f});
+
+    for(auto& treePos : env.trees)
+    {
+      drawTreeModel(game.treeModel, treePos);
+    }
 
     if(!player.animations.empty() && !player.animations[player.action].empty())
     {
@@ -307,7 +324,7 @@ int main() {
   EndDrawing();
 
 }
-
+  UnloadModel(game.treeModel);
   UnloadTexture(game.textures[0]);
   UnloadTexture(game.textures[1]);
   CloseWindow();
