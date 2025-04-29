@@ -4,6 +4,7 @@
 #include "game.h"
 #include "menu.h"
 #include "constants.h"
+#include "dungeon.h"
 
 int main()
 {
@@ -20,6 +21,12 @@ int main()
 
   MainMenu mainMenu;
   initMenu(mainMenu);
+
+  //Room room;
+  //initRoom(room);
+
+  Dungeon dungeon;
+  initDungeon(dungeon);
 
   Camera3D camera = {0};
   camera.position = {0.0f, 2.0f, -5.0f};
@@ -51,7 +58,14 @@ int main()
           ClearBackground(SKYBLUE);
 
           BeginMode3D(camera);
-          DrawGrid(10, 1.0f);
+          DrawGrid(11, 20.0f);
+          DrawCube((Vector3){20.0f, 0.0f, -20.0f}, 1.0f, 1.0f, 1.0f, RED);
+          //DrawCube((Vector3){20.0f, 0.0f, -20.0f}, 1.0f, 1.0f, 1.0f, RED);
+          //DrawCube((Vector3){0.0f, 0.0f, -20.0f}, 1.0f, 1.0f, 1.0f, RED);
+          //DrawCube((Vector3){0.0f, 0.0f, -40.0f}, 1.0f, 1.0f, 1.0f, RED);
+
+          //drawRoom(room);
+          drawDungeon(dungeon);
           drawPlayer(player, camera, game.textures[player.direction]);
           EndMode3D();
 
