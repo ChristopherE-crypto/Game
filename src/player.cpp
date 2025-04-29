@@ -5,7 +5,7 @@
 
 void initPlayer(Player& player)
 {
-  player.position = (Vector3){0.0f, 0.0f, 0.0f};
+  player.position = (Vector3){10.0f, 0.1f, -10.0f};
   player.size = (Vector3){5.0f, 5.0f, 5.0f};
   player.currentVelocity = {0};
   player.acceleration = 10.0f;
@@ -215,47 +215,6 @@ void updatePlayer(Player& player, float deltaTime, Camera3D& camera, float& came
   handleCameraMovement(player, camera, cameraRotationAngle, cameraDistance, deltaTime);
 
 
-  /*
-  if(IsKeyDown(KEY_Q)) 
-  {
-    cameraRotationAngle -= cameraRotationSpeed * deltaTime;
-  }
-  if(isKeyDown(KEY_E))
-  {
-    cameraRotationAngle += cameraRotationSpeed * deltaTime;
-  }
-
-  float wheel = GetMouseWheelMove();
-  if(wheel != 0)
-  {
-    cameraDistance = Clamp(cameraDistance - wheel * zoomSpeed * deltaTime, minCameraDistance, maxCameraDistance);
-  }
-  
-
-  cameraRotationAngle = fmodf(cameraRotationAngle, 2 * PI);
-
-  if(cameraRotationAngle < 0)
-  {
-    cameraRotationAngle += 2 * PI;
-  }
-
-
-  cameraOffset = {
-    sinf(cameraRotationAngle) * cameraDistance,
-    cameraHeight,
-    cosf(cameraRotationAngle) * cameraDistance
-  };
-
-  Vector3 desiredCameraPos = {
-    player.position.x + cameraOffset.x,
-    player.position.y + cameraOffset.y,
-    player.position.z + cameraOffset.z
-  };
-
-  camera.position = Vector3Lerp(camera.position, desiredCameraPos, cameraFollowSpeed * deltaTime);
-
-  camera.target = player.position;
-  */
 }
 
 void drawPlayer(Player& player, Camera3D& camera, Texture2D& texture)
