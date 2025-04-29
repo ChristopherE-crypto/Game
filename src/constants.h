@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <raylib.h>
+
 constexpr int TITLE_FONT_SIZE = 50;
 
 // window dimensions
@@ -33,5 +35,14 @@ constexpr float CAMERA_MAX_DISTANCE = 20.0f;
 constexpr float CAMERA_ZOOM_SPEED = 75.0f;
 constexpr float CAMERA_HEIGHT = 2.0f;
 constexpr float CAMERA_FOLLOW_SPEED = 5.0f;
+
+// starter room constants
+constexpr Vector2 ROOM_UPPER_RIGHT_CORNER = {20.0f, -20.0f};
+constexpr Vector2 ROOM_LOWER_RIGHT_CORNER = {20.0f, 0.0f};
+constexpr Vector2 ROOM_LOWER_LEFT_CORNER = {0.0f, 0.0f};
+constexpr Vector2 ROOM_UPPER_LEFT_CORNER = {0.0f, -20.0f};
+constexpr float ROOM_WIDTH = 20.0f;
+constexpr float ROOM_HEIGHT = ROOM_WIDTH;
+
 
 #endif
