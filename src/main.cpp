@@ -26,7 +26,9 @@ int main()
   //initRoom(room);
 
   Dungeon dungeon;
-  initDungeon(dungeon);
+  //initDungeon(dungeon, roomCorners);
+  loadFirstDungeon(dungeon);
+  buildDungeon(dungeon);
 
   Camera3D camera = {0};
   camera.position = {0.0f, 2.0f, -5.0f};
