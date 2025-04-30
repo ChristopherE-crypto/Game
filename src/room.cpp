@@ -55,6 +55,46 @@ void initRoom(Room& room)
   //addWallsToRoom(room);
 }
 
+void buildRoom(Room& room, std::vector<Vector2> roomCorners, float width, float height, float length)
+{
+  Wall wallEast = {
+    (Vector3){roomCorners[0].x, 2.5f, roomCorners[0].y + ROOM_HEIGHT / 2},
+    width, // 1
+    height, // 5
+    length, // 5
+    RED
+  };
+
+  Wall wallSouth = {
+    (Vector3){roomCorners[1].x - ROOM_WIDTH / 2, 2.5f, roomCorners[1].y},
+    length,
+    height,
+    width,
+    BLUE
+  };
+
+  Wall wallWest = {
+    (Vector3){roomCorners[2].x, 2.5f, roomCorners[2].y - ROOM_HEIGHT / 2},
+    width,
+    height,
+    length,
+    YELLOW
+  };
+
+  Wall wallNorth = {
+    (Vector3){roomCorners[3].x + ROOM_WIDTH / 2, 2.5f, roomCorners[3].y},
+    length,
+    height,
+    width,
+    GREEN
+  };
+
+  room.walls.push_back(wallEast);
+  room.walls.push_back(wallSouth);
+  room.walls.push_back(wallWest);
+  room.walls.push_back(wallNorth);
+}
+
 void drawRoom(Room& room)
 {
   for(int i = 0; i < room.walls.size(); i++)

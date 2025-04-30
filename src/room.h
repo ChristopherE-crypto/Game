@@ -26,6 +26,7 @@ void addWallToRoom(Room& room, Wall& wall);
 void drawWall(Wall& wall);
 void initRoom(Room& room);
 void drawRoom(Room& room);
+void buildRoom(Room& room, std::vector<Vector2> roomCorners, float width, float height, float length);
 
 
 
