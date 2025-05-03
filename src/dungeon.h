@@ -12,6 +12,7 @@ struct Dungeon
 
 void initDungeon(Dungeon& dungeon);
 void drawDungeon(Dungeon& dungeon);
+void drawDungeon();
 void buildStarterRoom(Dungeon& dungeon);
 void buildDungeon(Dungeon& dungeon);
 void loadFirstDungeon(Dungeon& dungeon);
