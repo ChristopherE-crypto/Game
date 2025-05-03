@@ -11,7 +11,7 @@ else
 endif
 
 SRCS = ./src/main.cpp ./src/player.cpp ./src/menu.cpp ./src/game.cpp ./src/room.cpp ./src/dungeon.cpp
-HDRS = ./src/game.h ./src/player.h ./src/menu.h ./src/room.h ./src/dungeon.h
+HDRS = ./src/game.h ./src/player.h ./src/menu.h ./src/room.h ./src/dungeon.h ./src/constants.h
 OBJS = $(SRCS:.cpp=.o)
 EXEC = game
 
