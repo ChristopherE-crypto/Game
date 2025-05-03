@@ -57,12 +57,14 @@ void initRoom(Room& room)
 
 void buildRoom(Room& room, std::vector<Vector2> roomCorners, float width, float height, float length)
 {
+  room.walls.clear();
+
   Wall wallEast = {
     (Vector3){roomCorners[0].x, 2.5f, roomCorners[0].y + ROOM_HEIGHT / 2},
     width, // 1
     height, // 5
-    length, // 5
-    RED
+    length, // 20
+    GRAY
   };
 
   Wall wallSouth = {
@@ -70,7 +72,7 @@ void buildRoom(Room& room, std::vector<Vector2> roomCorners, float width, float 
     length,
     height,
     width,
-    BLUE
+    GRAY
   };
 
   Wall wallWest = {
@@ -78,7 +80,7 @@ void buildRoom(Room& room, std::vector<Vector2> roomCorners, float width, float 
     width,
     height,
     length,
-    YELLOW
+    GRAY
   };
 
   Wall wallNorth = {
@@ -86,7 +88,7 @@ void buildRoom(Room& room, std::vector<Vector2> roomCorners, float width, float 
     length,
     height,
     width,
-    GREEN
+    GRAY
   };
 
   room.walls.push_back(wallEast);
