@@ -30,8 +30,8 @@ constexpr float PLAYER_SPRITE_SCALE = 0.0625f;
 
 // camera constants
 constexpr float CAMERA_ROTATION_SPEED = 1.5f;
-constexpr float CAMERA_MIN_DISTANCE = 3.0f;
-constexpr float CAMERA_MAX_DISTANCE = 20.0f;
+constexpr float CAMERA_MIN_DISTANCE = 5.0f;
+constexpr float CAMERA_MAX_DISTANCE = 7.0f;
 constexpr float CAMERA_ZOOM_SPEED = 75.0f;
 constexpr float CAMERA_HEIGHT = 2.0f;
 constexpr float CAMERA_FOLLOW_SPEED = 5.0f;
@@ -43,6 +43,6 @@ constexpr Vector2 ROOM_LOWER_LEFT_CORNER = {0.0f, 0.0f};
 constexpr Vector2 ROOM_UPPER_LEFT_CORNER = {0.0f, -20.0f};
 constexpr float ROOM_WIDTH = 20.0f;
 constexpr float ROOM_HEIGHT = ROOM_WIDTH;
-
+//Texture2D WALL_TEXTURE = LoadTexture("../assets/wall_texture.png");
 
 #endif
